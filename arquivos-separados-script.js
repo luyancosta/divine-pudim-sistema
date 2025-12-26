@@ -57,7 +57,13 @@ const PRODUTOS = [
 ];
 
 // ===== GERENCIAMENTO DE DADOS =====
-let orders = JSON.parse(localStorage.getItem('divinePudimOrders')) || [];
+async function carregarPedidos() {
+  const snapshot = await getDocs(collection(db, "pedidos"));
+  orders = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+}
 let currentOrderId = null;
 let currentFilter = 'hoje';
 let currentMonth = new Date().getMonth();
