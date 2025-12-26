@@ -4,6 +4,23 @@
 // ================================
 
 // ===== BANCO DE DADOS DE PRODUTOS =====
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBaE1Q1Y5VCuSVbkBcHwRuqldKcvrm6QDs",
+  authDomain: "divine-pudim.firebaseapp.com",
+  projectId: "divine-pudim",
+  storageBucket: "divine-pudim.firebasestorage.app",
+  messagingSenderId: "227284383690",
+  appId: "1:227284383690:web:00138a96f42de54de8c133"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+</script>
+
 const PRODUTOS = [
     // Doces e Sobremesas
     { nome: 'Delícia de abacaxi', tamanhos: [{ tamanho: 'P', preco: 35 }, { tamanho: 'G', preco: 55 }] },
