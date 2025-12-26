@@ -522,7 +522,7 @@ function saveOrder(event) {
             action: 'Pedido criado',
             details: `Cliente: ${order.clienteNome}`
         }];
-        orders.push(order);
+        await addDoc(collection(db, "pedidos"), order);
     }
     
     localStorage.setItem('divinePudimOrders', JSON.stringify(orders));
