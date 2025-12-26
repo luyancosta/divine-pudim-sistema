@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divine Pudim Gourmet - Sistema de Controle V2</title>
+    <link rel="stylesheet" href="styles-v2.css">
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">
+                    <i class="fas fa-birthday-cake"></i>
+                    Divine Pudim Gourmet
+                </h1>
+                <div class="header-actions">
+                    <button class="btn-header" onclick="exportBackup()">
+                        <i class="fas fa-download"></i> Backup
+                    </button>
+                    <button class="btn-header" onclick="importBackup()">
+                        <i class="fas fa-upload"></i> Importar
+                    </button>
+                    <button class="btn-primary" onclick="showNewOrderModal()">
+                        <i class="fas fa-plus"></i> Novo Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ALERTAS -->
+    <div id="alertsContainer" class="alerts-container"></div>
+
+    <!-- TABS NAVIGATION -->
+    <section class="tabs-nav">
+        <div class="container">
+            <div class="tabs-buttons">
+                <button class="tab-btn active" onclick="showTab('dashboard')">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </button>
+                <button class="tab-btn" onclick="showTab('pedidos')">
+                    <i class="fas fa-shopping-bag"></i> Pedidos
+                </button>
+                <button class="tab-btn" onclick="showTab('producao')">
+                    <i class="fas fa-industry"></i> Produção
+                </button>
+                <button class="tab-btn" onclick="showTab('calendario')">
+                    <i class="fas fa-calendar-alt"></i> Calendário
+                </button>
+                <button class="tab-btn" onclick="showTab('graficos')">
+                    <i class="fas fa-chart-pie"></i> Gráficos
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- TAB: DASHBOARD -->
+    <section id="tabDashboard" class="tab-content active">
+        <div class="dashboard">
+            <div class="container">
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="card-info">
+                            <h3 id="totalPedidos">0</h3>
+                            <p>Total de Pedidos</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="card-info">
+                            <h3 id="pedidosEntregues">0</h3>
+                            <p>Pedidos Entregues</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="card-info">
+                            <h3 id="pedidosPendentes">0</h3>
+                            <p>Pedidos Pendentes</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="card-info">
+                            <h3 id="totalFaturado">R$ 0,00</h3>
+                            <p>Total Faturado</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="card-info">
+                            <h3 id="totalReceber">R$ 0,00</h3>
+                            <p>Total a Receber</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-icon" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <div class="card-info">
+                            <h3 id="totalEntregas">R$ 0,00</h3>
+                            <p>Taxas de Entrega</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RELATÓRIO DE PRODUTOS -->
+                <div class="products-report">
+                    <h2 class="section-title">
+                        <i class="fas fa-birthday-cake"></i> Produtos Mais Pedidos
+                    </h2>
+                    <div id="productsReportList" class="products-list">
+                        <!-- Será preenchido via JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TAB: PEDIDOS -->
+    <section id="tabPedidos" class="tab-content">
+        <!-- BUSCA RÁPIDA -->
+        <section class="search-bar">
+            <div class="container">
+                <div class="search-input-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar por nome do cliente ou número do pedido..." oninput="searchOrders()">
+                    <button class="btn-clear-search" onclick="clearSearch()" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- FILTROS -->
+        <section class="filters">
+            <div class="container">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label><i class="fas fa-calendar"></i> Data da Entrega</label>
+                        <input type="date" id="filterData" onchange="applyFilters()">
+                    </div>
+
+                    <div class="filter-group">
+                        <label><i class="fas fa-map-marker-alt"></i> Bairro</label>
+                        <select id="filterBairro" onchange="applyFilters()">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label><i class="fas fa-credit-card"></i> Pagamento</label>
+                        <select id="filterPagamento" onchange="applyFilters()">
+                            <option value="">Todos</option>
+                            <option value="Pix">Pix</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="Cartão">Cartão</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label><i class="fas fa-sun"></i> Turno</label>
+                        <select id="filterTurno" onchange="applyFilters()">
+                            <option value="">Todos</option>
+                            <option value="Manhã">Manhã</option>
+                            <option value="Tarde">Tarde</option>
+                            <option value="Retirada no local">Retirada</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label><i class="fas fa-tasks"></i> Status</label>
+                        <select id="filterStatus" onchange="applyFilters()">
+                            <option value="">Todos</option>
+                            <option value="Pedido confirmado">Confirmado</option>
+                            <option value="Produzindo">Produzindo</option>
+                            <option value="Pronto">Pronto</option>
+                            <option value="Em rota">Em rota</option>
+                            <option value="Entregue">Entregue</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <button class="btn-secondary" onclick="clearFilters()">
+                            <i class="fas fa-times"></i> Limpar Filtros
+                        </button>
+                    </div>
+                </div>
+
+                <div class="export-buttons">
+                    <button class="btn-export" onclick="exportToPDF()">
+                        <i class="fas fa-file-pdf"></i> Exportar PDF
+                    </button>
+                    <button class="btn-export" onclick="exportToExcel()">
+                        <i class="fas fa-file-excel"></i> Exportar Excel
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LISTA DE PEDIDOS (GRID) -->
+        <section class="orders-section">
+            <div class="container">
+                <h2 class="section-title">
+                    <i class="fas fa-list"></i> Pedidos (<span id="pedidosCount">0</span>)
+                </h2>
+                <div id="ordersList" class="orders-grid">
+                    <!-- Pedidos serão inseridos aqui via JavaScript -->
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <!-- TAB: PRODUÇÃO -->
+    <section id="tabProducao" class="tab-content">
+        <div class="container">
+            <h2 class="section-title">
+                <i class="fas fa-industry"></i> Relatório de Produção
+            </h2>
+            
+            <div class="production-filters">
+                <button class="btn-filter-period active" onclick="filterProduction('hoje')">Hoje</button>
+                <button class="btn-filter-period" onclick="filterProduction('amanha')">Amanhã</button>
+                <button class="btn-filter-period" onclick="filterProduction('semana')">Esta Semana</button>
+                <button class="btn-filter-period" onclick="filterProduction('todos')">Todos Pendentes</button>
+            </div>
+
+            <div id="productionReport" class="production-report">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- TAB: CALENDÁRIO -->
+    <section id="tabCalendario" class="tab-content">
+        <div class="container">
+            <div class="calendar-header">
+                <button class="btn-calendar-nav" onclick="previousMonth()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h2 id="calendarTitle">Dezembro 2025</h2>
+                <button class="btn-calendar-nav" onclick="nextMonth()">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div id="calendar" class="calendar">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+            <div id="calendarOrders" class="calendar-orders">
+                <!-- Pedidos do dia selecionado -->
+            </div>
+        </div>
+    </section>
+
+    <!-- TAB: GRÁFICOS -->
+    <section id="tabGraficos" class="tab-content">
+        <div class="container">
+            <h2 class="section-title">
+                <i class="fas fa-chart-pie"></i> Análise e Gráficos
+            </h2>
+            
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3><i class="fas fa-birthday-cake"></i> Produtos Mais Vendidos</h3>
+                    <canvas id="chartProdutos"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <h3><i class="fas fa-dollar-sign"></i> Faturamento por Status</h3>
+                    <canvas id="chartFaturamento"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <h3><i class="fas fa-map-marker-alt"></i> Entregas por Bairro</h3>
+                    <canvas id="chartBairros"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <h3><i class="fas fa-credit-card"></i> Formas de Pagamento</h3>
+                    <canvas id="chartPagamento"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL NOVO/EDITAR PEDIDO -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">
+                    <i class="fas fa-plus-circle"></i> Novo Pedido
+                </h2>
+                <button class="modal-close" onclick="closeOrderModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="orderForm" onsubmit="saveOrder(event)">
+                <div class="form-grid">
+                    <!-- DADOS DO CLIENTE -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-user"></i> Dados do Cliente</h3>
+                        
+                        <div class="form-group">
+                            <label>Nome do Cliente *</label>
+                            <input type="text" id="clienteNome" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>WhatsApp *</label>
+                            <input type="tel" id="clienteTelefone" placeholder="(88) 00000-0000" required>
+                        </div>
+
+                        <!-- BUSCA DE CEP -->
+                        <div class="form-group">
+                            <label>CEP (opcional)</label>
+                            <div class="cep-input-container">
+                                <input type="text" id="clienteCep" placeholder="00000-000" maxlength="9" oninput="formatCep(this)">
+                                <button type="button" class="btn-buscar-cep" onclick="buscarCep()">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                            </div>
+                            <small class="form-hint">Digite o CEP e clique em Buscar para preencher automaticamente</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Endereço Completo *</label>
+                            <textarea id="clienteEndereco" rows="2" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Bairro *</label>
+                            <select id="clienteBairro" onchange="handleBairroChange()" required>
+                                <option value="">Selecione o bairro</option>
+                                <optgroup label="Bairros de Juazeiro do Norte">
+                                    <option value="Centro">Centro</option>
+                                    <option value="Triângulo">Triângulo</option>
+                                    <option value="Santa Teresa">Santa Teresa</option>
+                                    <option value="Pirajá">Pirajá</option>
+                                    <option value="Lagoa Seca">Lagoa Seca</option>
+                                    <option value="Salesianos">Salesianos</option>
+                                    <option value="Tiradentes">Tiradentes</option>
+                                    <option value="São José">São José</option>
+                                    <option value="Frei Damião">Frei Damião</option>
+                                    <option value="Jardim Gonzaga">Jardim Gonzaga</option>
+                                    <option value="Campo Alegre">Campo Alegre</option>
+                                    <option value="Aeroporto">Aeroporto</option>
+                                    <option value="Novo Juazeiro">Novo Juazeiro</option>
+                                    <option value="Muriti">Muriti</option>
+                                    <option value="Limoeiro">Limoeiro</option>
+                                    <option value="Pio XII">Pio XII</option>
+                                    <option value="Jardim Campo Alegre">Jardim Campo Alegre</option>
+                                    <option value="Santo Antônio">Santo Antônio</option>
+                                    <option value="Romeirão">Romeirão</option>
+                                    <option value="OUTRO">+ Outro bairro</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="outroBairroGroup" style="display: none;">
+                            <label>Nome do Bairro</label>
+                            <input type="text" id="outroBairro" placeholder="Digite o nome do bairro">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Observações</label>
+                            <textarea id="clienteObservacoes" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- INFORMAÇÕES DO PEDIDO -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-clipboard"></i> Informações do Pedido</h3>
+                        
+                        <div class="form-group">
+                            <label>Data do Pedido *</label>
+                            <input type="date" id="dataPedido" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Data da Entrega *</label>
+                            <input type="date" id="dataEntrega" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Turno da Entrega *</label>
+                            <select id="turnoEntrega" required>
+                                <option value="">Selecione</option>
+                                <option value="Manhã">Manhã</option>
+                                <option value="Tarde">Tarde</option>
+                                <option value="Retirada no local">Retirada no local</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status *</label>
+                            <select id="statusPedido" required>
+                                <option value="Pedido confirmado">Pedido confirmado</option>
+                                <option value="Produzindo">Produzindo</option>
+                                <option value="Pronto">Pronto</option>
+                                <option value="Em rota">Em rota</option>
+                                <option value="Entregue">Entregue</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ITENS DO PEDIDO -->
+                <div class="form-section full-width">
+                    <h3><i class="fas fa-shopping-cart"></i> Itens do Pedido</h3>
+                    
+                    <div id="itemsList" class="items-list">
+                        <!-- Itens serão adicionados aqui -->
+                    </div>
+
+                    <button type="button" class="btn-add-item" onclick="addItem()">
+                        <i class="fas fa-plus"></i> Adicionar Item
+                    </button>
+
+                    <div class="total-pedido">
+                        <strong>Total do Pedido:</strong>
+                        <span id="totalPedidoDisplay">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <!-- CONTROLE FINANCEIRO -->
+                <div class="form-section full-width">
+                    <h3><i class="fas fa-dollar-sign"></i> Controle Financeiro</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Valor Total *</label>
+                            <input type="number" id="valorTotal" step="0.01" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Valor Pago Antecipadamente</label>
+                            <input type="number" id="valorPago" step="0.01" value="0" oninput="calculateRemaining()">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Forma de Pagamento *</label>
+                            <select id="formaPagamento" required>
+                                <option value="">Selecione</option>
+                                <option value="Pix">Pix</option>
+                                <option value="Dinheiro">Dinheiro</option>
+                                <option value="Cartão">Cartão</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Taxa de Entrega</label>
+                            <input type="number" id="taxaEntrega" step="0.01" value="0" oninput="calculateRemaining()">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Valor Restante a Receber</label>
+                            <input type="number" id="valorRestante" step="0.01" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" id="orderId">
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeOrderModal()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Salvar Pedido
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL HISTÓRICO -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2><i class="fas fa-history"></i> Histórico de Alterações</h2>
+                <button class="modal-close" onclick="closeHistoryModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="historyContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INPUT OCULTO PARA IMPORTAÇÃO -->
+    <input type="file" id="importInput" accept=".json" style="display: none;" onchange="handleImport(event)">
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="script-v2.js"></script>
+</body>
+</html>
