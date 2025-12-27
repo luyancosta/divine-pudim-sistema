@@ -535,5 +535,13 @@ const firebaseConfig = {
   window.db = getFirestore(app);
 </script>
     <script src="script-v2.js"></script>
+    async function salvarPedidoFirebase(pedido) {
+    try {
+        await addDoc(collection(window.db, "pedidos"), pedido);
+        console.log("Pedido salvo no Firebase!");
+    } catch (error) {
+        console.error("Erro ao salvar no Firebase:", error);
+    }
+}
 </body>
 </html>
